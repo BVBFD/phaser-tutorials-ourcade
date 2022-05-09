@@ -1,5 +1,5 @@
-import Phaser from './lib/phaser.js'
-import Game from './scenes/Game.js'
+import Phaser from './lib/phaser.js';
+import Game from './scenes/Game.js';
 
 export default new Phaser.Game({
   type: Phaser.AUTO,
@@ -15,4 +15,4 @@ export default new Phaser.Game({
       debug: true,
     },
   },
-})
+});

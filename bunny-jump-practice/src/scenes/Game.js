@@ -1,4 +1,4 @@
-import phaser from '../lib/phaser.js'
+import Phaser from '../lib/phaser.js'
 
 export default class Game extends Phaser.Scene {
   /**@type {Phaser.Physics.Arcade.Sprite} */
@@ -13,22 +13,20 @@ export default class Game extends Phaser.Scene {
 
   preload() {
     this.load.image('background', 'assets/bg_layer1.png')
-
     this.load.image('platform', 'assets/ground_grass.png')
-
     this.load.image('bunny-stand', 'assets/bunny1_stand.png')
+    this.cursor = this.input.keyboard.createCursorKeys()
   }
 
   create() {
     this.add.image(240, 320, 'background').setScrollFactor(1, 0)
-
     this.platforms = this.physics.add.staticGroup()
 
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; i++) {
       const x = Phaser.Math.Between(80, 400)
-      const y = 150 * i
+      const y = i * 150
 
-      /** @type {Phaser.Physics.Arcade.Sprite} */
+      /**@type {Phaser.Physics.Arcade.Sprite} */
       const platform = this.platforms.create(x, y, 'platform')
       platform.scale = 0.5
 
@@ -37,11 +35,13 @@ export default class Game extends Phaser.Scene {
       body.updateFromGameObject()
     }
 
-    this.player = this.physics.add.sprite(240, 320, 'bunny-stand').setScale(0.5)
+    this.player = this.physics.add.sprite(240, 320, 'bunny-stand')
+    this.player.scale = 0.5
     this.physics.add.collider(this.platforms, this.player)
+
     this.player.body.checkCollision.up = false
-    this.player.body.checkCollision.left = false
     this.player.body.checkCollision.right = false
+    this.player.body.checkCollision.left = false
 
     this.cameras.main.startFollow(this.player)
   }
@@ -58,10 +58,20 @@ export default class Game extends Phaser.Scene {
       const platform = child
 
       const scrollY = this.cameras.main.scrollY
+      console.log(scrollY)
+      console.log(platform.y)
       if (platform.y >= scrollY + 700) {
         platform.y = scrollY - Phaser.Math.Between(50, 100)
         platform.body.updateFromGameObject()
       }
     })
+
+    if (this.cursor.left.isDown) {
+      this.player.setVelocityX(-200)
+    } else if (this.cursor.right.isDown) {
+      this.player.setVelocityX(200)
+    } else {
+      this.player.setVelocityX(0)
+    }
   }
 }

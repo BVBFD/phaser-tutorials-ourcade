@@ -23,6 +23,10 @@ export default class Game extends Phaser.Scene {
     super('game')
   }
 
+  init() {
+    this.carrotsCollected = 0
+  }
+
   preload() {
     this.load.image('background', 'assets/bg_layer1.png')
 
@@ -119,6 +123,12 @@ export default class Game extends Phaser.Scene {
     }
 
     this.horizontalWrap(this.player)
+
+    const bottomPlatform = this.findBottomMostPlatform()
+    if (this.player.y > bottomPlatform.y + 200) {
+      // console.log('game over')
+      this.scene.start('game-over')
+    }
   }
 
   /**
@@ -167,5 +177,19 @@ export default class Game extends Phaser.Scene {
 
     const value = `Carrots: ${this.carrotsCollected}`
     this.carrotsCollectedText.text = value
+  }
+
+  findBottomMostPlatform() {
+    const platforms = this.platforms.getChildren()
+    let bottomPlatform = platforms[0]
+
+    for (let i = 1; i < platforms.length; i++) {
+      const platform = platforms[i]
+      if (platform.y < bottomPlatform.y) {
+        continue
+      }
+      bottomPlatform = platform
+    }
+    return bottomPlatform
   }
 }

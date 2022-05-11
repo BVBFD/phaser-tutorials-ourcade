@@ -126,4 +126,18 @@ export default class Game extends Phaser.Scene {
     this.carrots.killAndHide(carrot)
     this.physics.world.disableBody(carrot.body)
   }
+
+  findBottomMostPlatform() {
+    const platforms = this.platforms.getChildren()
+    let bottomPlatform = platforms[0]
+
+    for (let i = 1; i < platforms.length; i++) {
+      const platform = platforms[i]
+      if (platform.y < bottomPlatform.y) {
+        continue
+      }
+      bottomPlatform = platform
+    }
+    return bottomPlatform
+  }
 }

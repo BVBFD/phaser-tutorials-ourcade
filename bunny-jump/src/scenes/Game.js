@@ -2,6 +2,8 @@ import Carrot from '../game/Carrot.js'
 import Phaser from '../lib/phaser.js'
 
 export default class Game extends Phaser.Scene {
+  carrotsCollected = 0
+
   /** @type {Phaser.Physics.Arcade.Sprite} */
   player
 
@@ -13,6 +15,9 @@ export default class Game extends Phaser.Scene {
 
   /**@type {Phaser.Types.Input.Keyboard.CursorKeys} */
   cursors
+
+  /**@type {Phaser.GameObjects.Text} */
+  carrotsCollectedText
 
   constructor() {
     super('game')
@@ -74,6 +79,15 @@ export default class Game extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.player)
     this.cameras.main.setDeadzone(this.scale.width * 1.5)
+
+    const style = {
+      color: '#000',
+      fontSize: 24,
+    }
+    this.carrotsCollectedText = this.add
+      .text(240, 10, 'Carrots: 0', style)
+      .setScrollFactor(0)
+      .setOrigin(0.5, 0)
   }
 
   update() {
@@ -146,6 +160,12 @@ export default class Game extends Phaser.Scene {
    */
   hadleCollectCarrot(player, carrot) {
     this.carrots.killAndHide(carrot)
+
     this.physics.world.disableBody(carrot.body)
+
+    this.carrotsCollected++
+
+    const value = `Carrots: ${this.carrotsCollected}`
+    this.carrotsCollectedText.text = value
   }
 }

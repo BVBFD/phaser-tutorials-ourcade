@@ -2,6 +2,8 @@ import Carrot from '../game/Carrot.js'
 import Phaser from '../lib/phaser.js'
 
 export default class Game extends Phaser.Scene {
+  carrotsCollected = 0
+
   /**@type {Phaser.Physics.Arcade.Sprite} */
   player
 
@@ -14,8 +16,15 @@ export default class Game extends Phaser.Scene {
   /**@type {Phaser.Types.Input.Keyboard.CursorKeys} */
   cursor
 
+  /** @type {Phaser.GameObjects.Text} */
+  carrotsCollectedText
+
   constructor() {
     super('game')
+  }
+
+  init() {
+    this.carrotsCollected = 0
   }
 
   preload() {
@@ -66,6 +75,16 @@ export default class Game extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.player)
     this.cameras.main.setDeadzone(this.scale.width * 1.5)
+
+    const style = {
+      color: '#000',
+      fontSize: 24,
+    }
+
+    this.carrotsCollectedText = this.add
+      .text(240, 10, 'Carrots: 0', style)
+      .setScrollFactor(0)
+      .setOrigin(0.5, 0)
   }
 
   update() {
@@ -96,6 +115,13 @@ export default class Game extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0)
     }
+
+    this.horizontalWrap(this.player)
+
+    const bottomPlatform = this.findBottomMostPlatform()
+    if (this.player.y > bottomPlatform.y + 200) {
+      this.scene.start('game-over')
+    }
   }
 
   /**
@@ -118,6 +144,17 @@ export default class Game extends Phaser.Scene {
     return carrot
   }
 
+  /**@param {Phaser.GameObjects.Sprite} sprite */
+  horizontalWrap(sprite) {
+    const halfWidth = sprite.displayWidth * 0.5
+    const gameWidth = this.scale.width
+    if (sprite.x < -halfWidth) {
+      sprite.x = gameWidth + halfWidth
+    } else if (sprite.x > gameWidth + halfWidth) {
+      sprite.x = -halfWidth
+    }
+  }
+
   /**
    * @param {Phaser.Physics.Arcade.Sprite} player
    * @param {Carrot} carrot
@@ -125,6 +162,9 @@ export default class Game extends Phaser.Scene {
   handleCollectCarrot(player, carrot) {
     this.carrots.killAndHide(carrot)
     this.physics.world.disableBody(carrot.body)
+    this.carrotsCollected++
+    const value = `Carrots: ${this.carrotsCollected}`
+    this.carrotsCollectedText.text = value
   }
 
   findBottomMostPlatform() {
